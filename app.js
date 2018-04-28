@@ -1,22 +1,41 @@
+let mysql = require('mysql');
 let express = require('express');
 let app = express();
-let port = 80;
-let path = require('path');
 
-app.get('/calc.html', function (req, res) {
-    console.info("Hello server..");
-    res.sendFile(path.join(__dirname + '/client/calc.html'));
+let connection = mysql.createConnection({
+    hosr: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'grisha',
+    port: '3306'
 });
 
-app.get('/my.js', function (req, res) {
-    console.info("Hello server...");
-    res.sendFile(path.join(__dirname + '/client/my.js'));
+connection.connect(function (err) {
+    if(!err){
+        console.log('Database is connected');
+    } else{
+        console.log('Error connection database:' + err);
+    }
 });
 
-app.get('/mackBook', function (req, res) {
-    res.send('mackBook!')
+
+app.get('/list', function (req,res) {
+    var str='';
+    connection.query('SELECT * FROM persons', function (err, rows, fields) {
+        if(!err){
+            for(var i in rows){
+                str += rows[i].LastName + '<br>';
+            };
+            res.send(str);
+        }
+        else{
+            console.log('Error while performing query');
+        }
+
+    });
 });
 
-app.listen(port, function () {
-    console.log('Listening on port ', port)
-});
+
+app.listen(3000, function () {
+    console.log('Connection Node-Server are successful');
+})
